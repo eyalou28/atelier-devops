@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+    stages {
+        stage('Check SonarScanner Installation') {
+            steps {
+                script {
+                    def scannerHome = tool 'MySonarScanner'
+                    bat "\"${scannerHome}\\bin\\sonar-scanner.bat\" -v"
+                }
+            }
+        }
+        stage('Checkout GitHub') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Analyse SonarQube') {
+            steps {
+                script {
+                    def scannerHome = tool 'MySonarScanner'
+                    withSonarQubeEnv('projet') {
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\" " +
+                        "-Dsonar.projectKey=node-multibranches " +
+                        "-Dsonar.sources=. " +
+                        "-Dsonar.projectVersion=1.0.0 " +
+                        "-Dsonar.sourceEncoding=UTF-8"
+                    }
+                }
+            }
+        }
+    }
+}
